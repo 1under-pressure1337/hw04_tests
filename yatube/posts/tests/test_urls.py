@@ -25,7 +25,7 @@ class PostURLTests(TestCase):
 
     def setUp(self):
         self.guest_client = Client()
-        self.author = User.objects.create_user(username='testname')
+        self.user = User.objects.create_user(username='testname')
         self.authorized_client = Client()
         self.authorized_client.force_login(self.user)
         self.author_client = Client()
@@ -35,10 +35,10 @@ class PostURLTests(TestCase):
         """URL-адрес доступен гостю."""
         url_names = {
             '/': HTTPStatus.OK,
-            f'/group/{PostURLTests.group.slug}/': HTTPStatus.OK,
-            f'/profile/{PostURLTests.user.username}/': HTTPStatus.OK,
-            f'/posts/{PostURLTests.post.id}/': HTTPStatus.OK,
-            f'/posts/{PostURLTests.post.id}/edit/': HTTPStatus.FOUND,
+            f'/group/{self.group.slug}/': HTTPStatus.OK,
+            f'/profile/{self.user.username}/': HTTPStatus.OK,
+            f'/posts/{self.post.id}/': HTTPStatus.OK,
+            f'/posts/{self.post.id}/edit/': HTTPStatus.FOUND,
             '/create/': HTTPStatus.FOUND,
             '/unexisting_page/': HTTPStatus.NOT_FOUND,
         }
