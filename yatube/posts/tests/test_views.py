@@ -58,19 +58,30 @@ class PostPagesTests(TestCase):
 
     def test_index_page_show_correct_context(self):
         """Шаблон index.html сформирован с правильным контекстом."""
-        response = self.authorized_client.get(reverse('post:index'))
+        response = self.authorized_client.get(reverse('posts:index'))
         first_post = response.context['page_obj'][0]
         post_author_1 = first_post.author
         post_text_1 = first_post.text
-        self.assertEqual(post_author_1, 'testusername')
-        self.assertEqual(post_text_1, 'Тестовый пост')
+        self.assertEqual(post_author_1, self.post.author)
+        self.assertEqual(post_text_1, self.post.text)
 
     def test_group_list_page_show_correct_context(self):
         """Шаблон group_list.html сформирован с правильным контекстом."""
         response = self.authorized_client.get(reverse(
-            'post:group_list', kwargs={'slug': 'test-slug'}))
+            'posts:group_list', kwargs={'slug': 'test-slug'}))
         first_post = response.context['page_obj'][0]
         post_author_1 = first_post.author
         post_text_1 = first_post.text
-        self.assertEqual(post_author_1, 'testusername')
-        self.assertEqual(post_text_1, 'Тестовый пост')
+        self.assertEqual(post_author_1, self.post.author)
+        self.assertEqual(post_text_1, self.post.text)
+
+    def test_new_post_not_in_wrong_group(self):
+        """Пост не попал в группу, для которой не был предназначен"""
+        post = Post.objects.get(pk=1)
+        response = self.authorized_client.get(
+            reverse(
+                'posts:group_list', kwargs={'slug': self.group.slug}
+            )
+        )
+        print(response.context['page_obj'].object_list)
+        self.assertIn(post, response.context['page_obj'].object_list)
