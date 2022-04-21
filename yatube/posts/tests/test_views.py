@@ -3,7 +3,7 @@ from django.test import Client, TestCase
 from django.urls import reverse
 
 from posts.models import Group, Post
-from posts.tests.test_urls import PostURLTests
+
 
 User = get_user_model()
 
@@ -30,7 +30,7 @@ class PostPagesTests(TestCase):
 
     # Проверяем используемые шаблоны
     def test_pages_uses_correct_template(self):
-        """URL-адрес использует соответствующий шаблон."""
+        """View-классы используют ожидаемые HTML-шаблоны."""
         # Собираем в словарь пары "имя_html_шаблона: reverse(name)"
         templates_pages_names = {
             reverse('posts:index'): 'posts/index.html',
@@ -56,39 +56,21 @@ class PostPagesTests(TestCase):
                 response = self.authorized_client.get(reverse_name)
                 self.assertTemplateUsed(response, template)
 
-    def test_index_and_group_page_show_correct_context(self):
-        """Шаблон index сформирован с правильным контекстом."""
-        templates_context = {
-            reverse('posts:index'),
-            reverse('posts:group_list', kwargs={'slug': self.group.slug}),
-            reverse('posts:profile',
-                    kwargs={'username': self.user.username})
-        }
-        for template_context in templates_context:
-            with self.subTest(template_context=template_context):
-                response = self.authorized_client.get(template_context)
-                first_post = response.context['page_obj'][0]
-                self.assertEqual(
-                    first_post.text,
-                    PostURLTests.post.text)
-                self.assertEqual(
-                    first_post.author.username,
-                    PostURLTests.post.author.username)
-                self.assertEqual(
-                    first_post.group.title,
-                    PostURLTests.post.group.title)
-
-    def test_profile_page_show_correct_context(self):
-        response = self.authorized_client.get(
-            reverse('posts:profile', kwargs={
-                'username': f'{self.user.username}'}))
+    def test_index_page_show_correct_context(self):
+        """Шаблон index.html сформирован с правильным контекстом."""
+        response = self.authorized_client.get(reverse('post:index'))
         first_post = response.context['page_obj'][0]
-        self.assertEqual(
-            first_post.text,
-            PostURLTests.post.text)
-        self.assertEqual(
-            first_post.author.username,
-            PostURLTests.post.author.username)
-        self.assertEqual(
-            first_post.group.title,
-            PostURLTests.post.group.title)
+        post_author_1 = first_post.author
+        post_text_1 = first_post.text
+        self.assertEqual(post_author_1, 'testusername')
+        self.assertEqual(post_text_1, 'Тестовый пост')
+
+    def test_group_list_page_show_correct_context(self):
+        """Шаблон group_list.html сформирован с правильным контекстом."""
+        response = self.authorized_client.get(reverse(
+            'post:group_list', kwargs={'slug': 'test-slug'}))
+        first_post = response.context['page_obj'][0]
+        post_author_1 = first_post.author
+        post_text_1 = first_post.text
+        self.assertEqual(post_author_1, 'testusername')
+        self.assertEqual(post_text_1, 'Тестовый пост')
