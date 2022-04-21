@@ -33,10 +33,10 @@ class PostURLTests(TestCase):
         """URL-адрес доступен гостю."""
         url_names = {
             '/': HTTPStatus.OK,
-            f'/group/{PostURLTests.group.slug}/': HTTPStatus.OK,
-            f'/profile/{PostURLTests.user.username}/': HTTPStatus.OK,
-            f'/posts/{PostURLTests.post.id}/': HTTPStatus.OK,
-            f'/posts/{PostURLTests.post.id}/edit/': HTTPStatus.FOUND,
+            f'/group/{self.group.slug}/': HTTPStatus.OK,
+            f'/profile/{self.user.username}/': HTTPStatus.OK,
+            f'/posts/{self.post.id}/': HTTPStatus.OK,
+            f'/posts/{self.post.id}/edit/': HTTPStatus.FOUND,
             '/create/': HTTPStatus.FOUND,
             '/unexisting_page/': HTTPStatus.NOT_FOUND,
         }
@@ -51,10 +51,10 @@ class PostURLTests(TestCase):
         templates_url_names = {
             '/': 'posts/index.html',
             '/create/': 'posts/create_post.html',
-            f'/group/{PostURLTests.group.slug}/': 'posts/group_list.html',
-            f'/profile/{PostURLTests.user.username}/': 'posts/profile.html',
-            f'/posts/{PostURLTests.post.id}/': 'posts/post_detail.html',
-            f'/posts/{PostURLTests.post.id}/edit/': 'posts/create_post.html',
+            f'/group/{self.group.slug}/': 'posts/group_list.html',
+            f'/profile/{self.user.username}/': 'posts/profile.html',
+            f'/posts/{self.post.id}/': 'posts/post_detail.html',
+            f'/posts/{self.post.id}/edit/': 'posts/create_post.html',
         }
         for address, template in templates_url_names.items():
             with self.subTest(address=address):
@@ -66,7 +66,7 @@ class PostURLTests(TestCase):
         response = self.author_client.get(f'/posts/{self.post.id}/edit/')
         self.assertEqual(response.status_code, HTTPStatus.OK)
 
-    def create_url_redirect_anonymous_user_on_login(self):
+    def test_create_url_redirect_anonymous_user_on_login(self):
         """
         Страница post_create перенаправит анонимного
         пользователя на страницу логина.
