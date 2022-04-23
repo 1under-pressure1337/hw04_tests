@@ -83,5 +83,4 @@ class PostPagesTests(TestCase):
                 'posts:group_list', kwargs={'slug': self.group.slug}
             )
         )
-        print(response.context['page_obj'].object_list)
         self.assertIn(post, response.context['page_obj'].object_list)

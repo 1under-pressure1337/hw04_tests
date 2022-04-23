@@ -57,6 +57,7 @@ def get_page_context(queryset, request):
 
 @login_required
 def post_create(request):
+    form = PostForm(request.POST or None)
     if request.method == 'POST':
         form = PostForm(request.POST)
         if form.is_valid():
@@ -65,20 +66,18 @@ def post_create(request):
             form.save()
             return redirect('posts:profile', request.user)
         return render(request, 'posts/create_post.html', {'form': form})
-    form = PostForm()
     return render(request, 'posts/create_post.html', {'form': form})
 
 
 @login_required
 def post_edit(request, post_id):
     post = get_object_or_404(Post, id=post_id, author=request.user)
+    form = PostForm(request.POST or None, instance=post)
     if request.method == 'POST':
-        form = PostForm(request.POST or None, instance=post)
         if form.is_valid():
-            post = form.save(commit=False)
+            post = form.save()
             post.save()
             return redirect('posts:post_detail', post_id=post_id)
-    form = PostForm(request.POST or None, instance=post)
     context = {
         'form': form,
         'post': post,
